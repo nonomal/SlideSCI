@@ -2,7 +2,9 @@
 
 [English](README.en.md) | 简体中文
 
-<a href="https://hellogithub.com/repository/Achuan-2/SlideSCI" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=54e09132ba0a40cf9ff6594320e6c6ba&claim_uid=k20NpB9znZ3v6h8" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+<a href="https://hellogithub.com/repository/Achuan-2/SlideSCI" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=54e09132ba0a40cf9ff6594320e6c6ba&claim_uid=k20NpB9znZ3v6h8" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a> <a href="https://atomgit.com/Achuan-2/SlideSCI"><img alt="AtomGit G-Star" src="https://atomgit.com/Achuan-2/SlideSCI/star/new_badge.svg"></a>
+
+
 
 </div>
 
