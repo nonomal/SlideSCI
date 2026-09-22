@@ -101,6 +101,7 @@ Github地址：[https://github.com/Achuan-2/SlideSCI](https://github.com/Achuan-
   - **复制粘贴组格式**：快速把排版好的组合样式加给现有文本框
     ![](https://fastly.jsdelivr.net/gh/Achuan-2/PicBed/assets/Achuan的PPT插件_页面7-2026-06-11.png)
   - **复制位置和粘贴元素位置**：可以复制多个元素的位置，粘贴给其他元素（可以多选复制和粘贴！），可以用来让不同页的PPT的多个元素位置一致，或者让同一页的不同元素都是一个位置（可以先排好一组元素，用这个功能让另一组元素自动排好，再调整位置）。  
+  - **复制相对位置和粘贴相对位置**：先选择参考图，再按住 Ctrl 依次选择标注，即可记录标注相对于图片的位置；粘贴时先选择目标图，可继续选择已有标注，也可以只选目标图，让插件自动复制原标注并放到另一张相同大小图片的对应位置。复制时支持左上、上居中、右上、左居中、中心、右居中、左下、下居中、右下九种基准点。
     ​<img alt="" src="https://s2.loli.net/2025/08/29/q5vblI3nrDhewJ6.gif" />  
       
     ​<img alt="" src="https://s2.loli.net/2025/08/29/u19w8IMkOYjE3rz.gif" />

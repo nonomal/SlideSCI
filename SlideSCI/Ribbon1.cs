@@ -27,6 +27,9 @@ namespace SlideSCI
 
         private List<float> copiedLeft = new List<float>();
         private List<float> copiedTop = new List<float>();
+        private List<(float DeltaX, float DeltaY)> copiedRelativePositions =
+            new List<(float DeltaX, float DeltaY)>();
+        private List<Shape> copiedRelativeSourceShapes = new List<Shape>();
         private List<int> selectedShapeIdsByOrder = new List<int>();
         private SpacingForm spacingForm = null;
         private ScaleForm scaleForm = null;
@@ -45,6 +48,7 @@ namespace SlideSCI
         }
 
         private AlignmentPosition lastCopiedAlignment = AlignmentPosition.Center;
+        private AlignmentPosition lastCopiedRelativeAlignment = AlignmentPosition.TopLeft;
         private AlignmentPosition lastSwapAlignment = AlignmentPosition.TopLeft;
 
         private (float X, float Y) GetShapeAlignmentPoint(Shape shape, AlignmentPosition alignment)
@@ -828,6 +832,35 @@ namespace SlideSCI
             return sel.ShapeRange[1];
         }
 
+        private List<Shape> GetSelectedShapesInSelectionOrder(Selection sel)
+        {
+            var shapesById = sel.ShapeRange
+                .Cast<Shape>()
+                .ToDictionary(shape => shape.Id);
+            var orderedShapes = new List<Shape>();
+
+            foreach (int shapeId in selectedShapeIdsByOrder)
+            {
+                if (shapesById.TryGetValue(shapeId, out Shape shape))
+                {
+                    orderedShapes.Add(shape);
+                    shapesById.Remove(shapeId);
+                }
+            }
+
+            // 框选等操作可能无法提供逐个选择顺序，此时沿用 PowerPoint 的 ShapeRange 顺序。
+            foreach (Shape shape in sel.ShapeRange)
+            {
+                if (shapesById.ContainsKey(shape.Id))
+                {
+                    orderedShapes.Add(shape);
+                    shapesById.Remove(shape.Id);
+                }
+            }
+
+            return orderedShapes;
+        }
+
 
 
         /// <summary>
@@ -1123,6 +1156,154 @@ namespace SlideSCI
             else
             {
                 MessageBox.Show("Please select shapes to paste positions.");
+            }
+        }
+
+        private void copyRelativePosition_Click(object sender, RibbonControlEventArgs e)
+        {
+            CopyRelativePositionInternal(lastCopiedRelativeAlignment);
+        }
+
+        private void copyRelativePositionWithAlignment_Click(object sender, RibbonControlEventArgs e)
+        {
+            var button = sender as Microsoft.Office.Tools.Ribbon.RibbonButton;
+            if (button == null) return;
+
+            AlignmentPosition alignment = AlignmentPosition.TopLeft;
+            switch (button.Name)
+            {
+                case "copyRelativePosTopCenter":
+                    alignment = AlignmentPosition.TopCenter;
+                    break;
+                case "copyRelativePosTopRight":
+                    alignment = AlignmentPosition.TopRight;
+                    break;
+                case "copyRelativePosMiddleLeft":
+                    alignment = AlignmentPosition.MiddleLeft;
+                    break;
+                case "copyRelativePosCenter":
+                    alignment = AlignmentPosition.Center;
+                    break;
+                case "copyRelativePosMiddleRight":
+                    alignment = AlignmentPosition.MiddleRight;
+                    break;
+                case "copyRelativePosBottomLeft":
+                    alignment = AlignmentPosition.BottomLeft;
+                    break;
+                case "copyRelativePosBottomCenter":
+                    alignment = AlignmentPosition.BottomCenter;
+                    break;
+                case "copyRelativePosBottomRight":
+                    alignment = AlignmentPosition.BottomRight;
+                    break;
+            }
+
+            lastCopiedRelativeAlignment = alignment;
+            CopyRelativePositionInternal(alignment);
+        }
+
+        private void CopyRelativePositionInternal(AlignmentPosition alignment)
+        {
+            Selection sel = app.ActiveWindow.Selection;
+            if (sel.Type != PpSelectionType.ppSelectionShapes || sel.ShapeRange.Count < 2)
+            {
+                MessageBox.Show("请先选择参考图，再按住 Ctrl 选择至少一个标注。", "复制相对位置");
+                return;
+            }
+
+            List<Shape> orderedShapes = GetSelectedShapesInSelectionOrder(sel);
+            Shape referenceShape = orderedShapes[0];
+            var referencePoint = GetShapeAlignmentPoint(referenceShape, alignment);
+
+            copiedRelativePositions.Clear();
+            copiedRelativeSourceShapes.Clear();
+            for (int i = 1; i < orderedShapes.Count; i++)
+            {
+                var shapePoint = GetShapeAlignmentPoint(orderedShapes[i], alignment);
+                copiedRelativePositions.Add(
+                    (shapePoint.X - referencePoint.X, shapePoint.Y - referencePoint.Y)
+                );
+                copiedRelativeSourceShapes.Add(orderedShapes[i]);
+            }
+        }
+
+        private void pasteRelativePosition_Click(object sender, RibbonControlEventArgs e)
+        {
+            if (copiedRelativePositions.Count == 0)
+            {
+                MessageBox.Show("尚未复制相对位置。", "粘贴相对位置");
+                return;
+            }
+
+            Selection sel = app.ActiveWindow.Selection;
+            if (sel.Type != PpSelectionType.ppSelectionShapes || sel.ShapeRange.Count < 1)
+            {
+                MessageBox.Show("请先选择目标图；如需复用已有标注，再按住 Ctrl 依次选择标注。", "粘贴相对位置");
+                return;
+            }
+
+            List<Shape> orderedShapes = GetSelectedShapesInSelectionOrder(sel);
+            int targetShapeCount = orderedShapes.Count - 1;
+            if (targetShapeCount > copiedRelativePositions.Count)
+            {
+                MessageBox.Show(
+                    $"复制了 {copiedRelativePositions.Count} 个标注的位置，但当前选择了 {targetShapeCount} 个待移动标注。当前标注数量不能多于复制数量。",
+                    "粘贴相对位置"
+                );
+                return;
+            }
+
+            Shape referenceShape = orderedShapes[0];
+            var referencePoint = GetShapeAlignmentPoint(
+                referenceShape,
+                lastCopiedRelativeAlignment
+            );
+
+            var targetShapes = orderedShapes.Skip(1).ToList();
+            var newlyPastedShapes = new List<Shape>();
+            PowerPoint.Slide targetSlide = app.ActiveWindow.View.Slide;
+
+            try
+            {
+                for (int i = targetShapeCount; i < copiedRelativePositions.Count; i++)
+                {
+                    Shape sourceShape = copiedRelativeSourceShapes[i];
+                    sourceShape.Copy();
+                    Shape pastedShape = targetSlide.Shapes.Paste()[1];
+                    newlyPastedShapes.Add(pastedShape);
+                    targetShapes.Add(pastedShape);
+                }
+            }
+            catch (Exception ex)
+            {
+                foreach (Shape pastedShape in newlyPastedShapes)
+                {
+                    try
+                    {
+                        pastedShape.Delete();
+                    }
+                    catch
+                    {
+                        // 仅清理本次操作创建的形状；清理失败时继续报告原始错误。
+                    }
+                }
+
+                MessageBox.Show(
+                    $"无法复制原标注，源幻灯片或源形状可能已被删除或关闭。\n\n{ex.Message}",
+                    "粘贴相对位置"
+                );
+                return;
+            }
+
+            for (int i = 0; i < copiedRelativePositions.Count; i++)
+            {
+                var delta = copiedRelativePositions[i];
+                SetShapeAlignmentPoint(
+                    targetShapes[i],
+                    lastCopiedRelativeAlignment,
+                    referencePoint.X + delta.DeltaX,
+                    referencePoint.Y + delta.DeltaY
+                );
             }
         }
 

@@ -186,6 +186,18 @@ namespace SlideSCI
             this.copyPosBottomCenter = this.Factory.CreateRibbonButton();
             this.copyPosBottomRight = this.Factory.CreateRibbonButton();
             this.pastePosition = this.Factory.CreateRibbonButton();
+            this.copyRelativePosition = this.Factory.CreateRibbonSplitButton();
+            this.copyRelativePosTopLeft = this.Factory.CreateRibbonButton();
+            this.copyRelativePosTopCenter = this.Factory.CreateRibbonButton();
+            this.copyRelativePosTopRight = this.Factory.CreateRibbonButton();
+            this.copyRelativePosMiddleLeft = this.Factory.CreateRibbonButton();
+            this.copyRelativePosCenter = this.Factory.CreateRibbonButton();
+            this.copyRelativePosMiddleRight = this.Factory.CreateRibbonButton();
+            this.copyRelativePosBottomLeft = this.Factory.CreateRibbonButton();
+            this.copyRelativePosBottomCenter = this.Factory.CreateRibbonButton();
+            this.copyRelativePosBottomRight = this.Factory.CreateRibbonButton();
+            this.pasteRelativePosition = this.Factory.CreateRibbonButton();
+            this.separatorRelativePosition = this.Factory.CreateRibbonSeparator();
             this.swapPosition = this.Factory.CreateRibbonSplitButton();
             this.swapPosTopLeft = this.Factory.CreateRibbonButton();
             this.swapPosTopCenter = this.Factory.CreateRibbonButton();
@@ -614,6 +626,9 @@ namespace SlideSCI
             this.复制图片格式.Items.Add(this.pastePosition);
             this.复制图片格式.Items.Add(this.swapPosition);
             this.复制图片格式.Items.Add(this.separator5);
+            this.复制图片格式.Items.Add(this.copyRelativePosition);
+            this.复制图片格式.Items.Add(this.pasteRelativePosition);
+            this.复制图片格式.Items.Add(this.separatorRelativePosition);
             this.复制图片格式.Items.Add(this.copyImgWidth);
             this.复制图片格式.Items.Add(this.pasteImgWidth);
             this.复制图片格式.Items.Add(this.separator3);
@@ -640,6 +655,10 @@ namespace SlideSCI
             // separator5
             // 
             this.separator5.Name = "separator5";
+            //
+            // separatorRelativePosition
+            //
+            this.separatorRelativePosition.Name = "separatorRelativePosition";
             // 
             // separator3
             // 
@@ -1000,7 +1019,98 @@ namespace SlideSCI
             this.pastePosition.ShowImage = true;
             this.pastePosition.SuperTip = "将复制的位置应用到当前选中的形状上，可实现跨幻灯片甚至跨文档的精准对齐。";
             this.pastePosition.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.pastePosition_Click);
-            // 
+            //
+            // copyRelativePosition
+            //
+            this.copyRelativePosition.Image = ((System.Drawing.Image)(resources.GetObject("copyPosition.Image")));
+            this.copyRelativePosition.Items.Add(this.copyRelativePosTopLeft);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosTopCenter);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosTopRight);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosMiddleLeft);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosCenter);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosMiddleRight);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosBottomLeft);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosBottomCenter);
+            this.copyRelativePosition.Items.Add(this.copyRelativePosBottomRight);
+            this.copyRelativePosition.Label = "复制相对位置";
+            this.copyRelativePosition.Name = "copyRelativePosition";
+            this.copyRelativePosition.ScreenTip = "复制相对位置";
+            this.copyRelativePosition.SuperTip = "先选择参考图，再按住 Ctrl 依次选择标注。记录各标注相对于参考图所选基准点的位置。";
+            this.copyRelativePosition.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePosition_Click);
+            //
+            // copyRelativePosTopLeft
+            //
+            this.copyRelativePosTopLeft.Label = "左上角";
+            this.copyRelativePosTopLeft.Name = "copyRelativePosTopLeft";
+            this.copyRelativePosTopLeft.ShowImage = true;
+            this.copyRelativePosTopLeft.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosTopCenter
+            //
+            this.copyRelativePosTopCenter.Label = "上居中";
+            this.copyRelativePosTopCenter.Name = "copyRelativePosTopCenter";
+            this.copyRelativePosTopCenter.ShowImage = true;
+            this.copyRelativePosTopCenter.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosTopRight
+            //
+            this.copyRelativePosTopRight.Label = "右上角";
+            this.copyRelativePosTopRight.Name = "copyRelativePosTopRight";
+            this.copyRelativePosTopRight.ShowImage = true;
+            this.copyRelativePosTopRight.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosMiddleLeft
+            //
+            this.copyRelativePosMiddleLeft.Label = "左居中";
+            this.copyRelativePosMiddleLeft.Name = "copyRelativePosMiddleLeft";
+            this.copyRelativePosMiddleLeft.ShowImage = true;
+            this.copyRelativePosMiddleLeft.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosCenter
+            //
+            this.copyRelativePosCenter.Label = "中心";
+            this.copyRelativePosCenter.Name = "copyRelativePosCenter";
+            this.copyRelativePosCenter.ShowImage = true;
+            this.copyRelativePosCenter.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosMiddleRight
+            //
+            this.copyRelativePosMiddleRight.Label = "右居中";
+            this.copyRelativePosMiddleRight.Name = "copyRelativePosMiddleRight";
+            this.copyRelativePosMiddleRight.ShowImage = true;
+            this.copyRelativePosMiddleRight.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosBottomLeft
+            //
+            this.copyRelativePosBottomLeft.Label = "左下角";
+            this.copyRelativePosBottomLeft.Name = "copyRelativePosBottomLeft";
+            this.copyRelativePosBottomLeft.ShowImage = true;
+            this.copyRelativePosBottomLeft.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosBottomCenter
+            //
+            this.copyRelativePosBottomCenter.Label = "下居中";
+            this.copyRelativePosBottomCenter.Name = "copyRelativePosBottomCenter";
+            this.copyRelativePosBottomCenter.ShowImage = true;
+            this.copyRelativePosBottomCenter.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // copyRelativePosBottomRight
+            //
+            this.copyRelativePosBottomRight.Label = "右下角";
+            this.copyRelativePosBottomRight.Name = "copyRelativePosBottomRight";
+            this.copyRelativePosBottomRight.ShowImage = true;
+            this.copyRelativePosBottomRight.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.copyRelativePositionWithAlignment_Click);
+            //
+            // pasteRelativePosition
+            //
+            this.pasteRelativePosition.Image = ((System.Drawing.Image)(resources.GetObject("pastePosition.Image")));
+            this.pasteRelativePosition.Label = "粘贴相对位置";
+            this.pasteRelativePosition.Name = "pasteRelativePosition";
+            this.pasteRelativePosition.ScreenTip = "粘贴相对位置";
+            this.pasteRelativePosition.ShowImage = true;
+            this.pasteRelativePosition.SuperTip = "先选择目标图；也可按住 Ctrl 依次选择已有标注。已有标注不足时，将自动复制源标注并按复制时的基准点恢复相对位置。";
+            this.pasteRelativePosition.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.pasteRelativePosition_Click);
+            //
             // swapPosition
             // 
             this.swapPosition.Image = ((System.Drawing.Image)(resources.GetObject("swapPosition.Image")));
@@ -1323,6 +1433,18 @@ namespace SlideSCI
         internal Microsoft.Office.Tools.Ribbon.RibbonButton copyPosBottomCenter;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton copyPosBottomRight;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton pastePosition;
+        internal Microsoft.Office.Tools.Ribbon.RibbonSplitButton copyRelativePosition;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosTopLeft;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosTopCenter;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosTopRight;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosMiddleLeft;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosCenter;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosMiddleRight;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosBottomLeft;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosBottomCenter;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton copyRelativePosBottomRight;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton pasteRelativePosition;
+        internal Microsoft.Office.Tools.Ribbon.RibbonSeparator separatorRelativePosition;
         internal Microsoft.Office.Tools.Ribbon.RibbonSplitButton swapPosition;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton swapPosTopLeft;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton swapPosTopCenter;
